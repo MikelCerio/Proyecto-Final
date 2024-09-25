@@ -1,9 +1,24 @@
 import streamlit as st
 import pandas as pd
-import joblib
+import pickle as pkl
+import os
+
+# Obtener la ruta del directorio actual donde se encuentra este script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construir la ruta relativa al modelo
+model_path = os.path.join(current_dir, "..", "models", "model_6.pkl")
 
 # Cargar el modelo
-model = joblib.load("../models/model_6.pkl")  # Usamos el Voting Classifier
+try:
+    with open(model_path, "rb") as f:
+        model = pkl.load(f)
+    st.success("Modelo cargado exitosamente.")
+except FileNotFoundError:
+    st.error(f"No se pudo encontrar el archivo del modelo en: {model_path}")
+    st.info("Asegúrate de que el archivo 'model_6.pkl' esté en la carpeta 'models' un nivel arriba de este script.")
+except Exception as e:
+    st.error(f"Ocurrió un error al cargar el modelo: {str(e)}")
 
 st.title('Predictor de Intención de Compra')
 
@@ -33,8 +48,11 @@ input_data = pd.DataFrame({
 
 # Hacer la predicción
 if st.button('Predecir'):
-    prediction = model.predict(input_data)
-    probability = model.predict_proba(input_data)[0][1]
-    
-    st.write(f"Predicción: {'Compra' if prediction[0] == 1 else 'No Compra'}")
-    st.write(f"Probabilidad de compra: {probability:.2f}")
+    if 'model' in locals():
+        prediction = model.predict(input_data)
+        probability = model.predict_proba(input_data)[0][1]
+        
+        st.write(f"Predicción: {'Compra' if prediction[0] == 1 else 'No Compra'}")
+        st.write(f"Probabilidad de compra: {probability:.2f}")
+    else:
+        st.error("El modelo no se ha cargado correctamente. Por favor, verifica la ruta del modelo.")

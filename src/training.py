@@ -7,10 +7,10 @@ import xgboost as xgb
 from sklearn.svm import SVC
 from sklearn.ensemble import VotingClassifier
 from sklearn.cluster import KMeans
-import joblib
+import pickle as pkl
 
 def load_data():
-    data = pd.read_csv("../data/processed/processed_data.csv")
+    data = pd.read_csv("../data/processed/clientes_preprocesados.csv")
     X = data.drop('Revenue', axis=1)
     y = data['Revenue']
     return X, y
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     
     # Guardar los modelos
     for i, model in enumerate(models[:-2]):  # Excluimos X_test y y_test
-        joblib.dump(model, f"../models/model_{i+1}.pkl")
+        pkl.dump(model, f"../models/model_{i+1}.pkl")
     
     # Guardar datos de prueba
     pd.concat([models[-2], models[-1]], axis=1).to_csv("../data/test/test_data.csv", index=False)
