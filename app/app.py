@@ -14,6 +14,8 @@ try:
     with open(model_path, "rb") as f:
         model = pkl.load(f)
     st.success("Modelo cargado exitosamente.")
+    st.write(f"Tipo de modelo cargado: {type(model)}")
+    st.write(f"Atributos del modelo: {dir(model)}")
 except FileNotFoundError:
     st.error(f"No se pudo encontrar el archivo del modelo en: {model_path}")
     st.info("Asegúrate de que el archivo 'model_6.pkl' esté en la carpeta 'models' un nivel arriba de este script.")
@@ -49,10 +51,15 @@ input_data = pd.DataFrame({
 # Hacer la predicción
 if st.button('Predecir'):
     if 'model' in locals():
-        prediction = model.predict(input_data)
-        probability = model.predict_proba(input_data)[0][1]
-        
-        st.write(f"Predicción: {'Compra' if prediction[0] == 1 else 'No Compra'}")
-        st.write(f"Probabilidad de compra: {probability:.2f}")
+        st.write(f"Tipo de modelo: {type(model)}")
+        st.write(f"Forma de input_data: {input_data.shape}")
+        try:
+            prediction = model.predict(input_data)
+            probability = model.predict_proba(input_data)[0][1]
+            
+            st.write(f"Predicción: {'Compra' if prediction[0] == 1 else 'No Compra'}")
+            st.write(f"Probabilidad de compra: {probability:.2f}")
+        except Exception as e:
+            st.error(f"Error al hacer la predicción: {str(e)}")
     else:
         st.error("El modelo no se ha cargado correctamente. Por favor, verifica la ruta del modelo.")
